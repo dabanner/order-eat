@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { SideMenu } from '../../components/SideMenu/side-menu';
 
 interface Category {
   id: string;
@@ -55,6 +56,7 @@ export default function HomeScreen() {
   const [restaurantsCurrentPage, setRestaurantsCurrentPage] = useState(1);
   const [restaurantsRenderedData, setRestaurantsRenderedData] = useState<Restaurant[]>([]);
   const [isLoadingRestaurants, setIsLoadingRestaurants] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const pagination = <T extends Category | Restaurant>(database: T[], currentPage: number, pageSize: number): T[] => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -116,110 +118,119 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton}>
-          <MaterialIcons name="menu" size={24} color="#000" />
-        </TouchableOpacity>
-        <View style={styles.deliverTo}>
-          <Text style={styles.deliverToLabel}>DELIVER TO</Text>
-          <View style={styles.locationRow}>
-            <Text style={styles.location}>Halal Lab office</Text>
-            <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
+    <>
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.menuButton}
+            onPress={() => setIsMenuOpen(true)}
+          >
+            <MaterialIcons name="menu" size={24} color="#000" />
+          </TouchableOpacity>
+          <View style={styles.deliverTo}>
+            <Text style={styles.deliverToLabel}>DELIVER TO</Text>
+            <View style={styles.locationRow}>
+              <Text style={styles.location}>Halal Lab office</Text>
+              <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
+            </View>
           </View>
+          <TouchableOpacity style={styles.cartButton}>
+            <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>2</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.cartButton}>
-          <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>2</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
 
-      {/* Greeting */}
-      <Text style={styles.greeting}>Hey Halal, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
+        {/* Greeting */}
+        <Text style={styles.greeting}>Hey Halal, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search dishes, restaurants"
-          placeholderTextColor="#666"
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search dishes, restaurants"
+            placeholderTextColor="#666"
+          />
+        </View>
+
+        <FlatList
+          ListHeaderComponent={
+            <>
+              {/* Categories Section */}
+              <View style={styles.categoriesHeader}>
+                <Text style={styles.sectionTitle}>All Categories</Text>
+                <TouchableOpacity style={styles.seeAllContainer}>
+                  <Text style={styles.seeAll}>See All</Text>
+                  <MaterialIcons name="chevron-right" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              <FlatList
+                data={categoriesRenderedData}
+                renderItem={renderCategoryItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                onEndReachedThreshold={0.5}
+                onEndReached={() => {
+                  if (isLoadingCategories) {
+                    return;
+                  }
+                  setIsLoadingCategories(true);
+                  const contentToAppend = pagination(
+                    categories,
+                    categoriesCurrentPage + 1,
+                    pageSize,
+                  );
+                  if (contentToAppend.length > 0) {
+                    setCategoriesCurrentPage(categoriesCurrentPage + 1);
+                    setCategoriesRenderedData(prev => [...prev, ...contentToAppend]);
+                  }
+                  setIsLoadingCategories(false);
+                }}
+                style={styles.categoriesScroll}
+              />
+
+              {/* Restaurants Section */}
+              <View style={styles.categoriesHeader}>
+                <Text style={styles.sectionTitle}>Open Restaurants</Text>
+                <TouchableOpacity style={styles.seeAllContainer}>
+                  <Text style={styles.seeAll}>See All</Text>
+                  <MaterialIcons name="chevron-right" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+            </>
+          }
+          data={restaurantsRenderedData}
+          renderItem={renderRestaurantItem}
+          keyExtractor={(item) => item.id}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+            if (isLoadingRestaurants) {
+              return;
+            }
+            setIsLoadingRestaurants(true);
+            const contentToAppend = pagination(
+              restaurants,
+              restaurantsCurrentPage + 1,
+              pageSize,
+            );
+            if (contentToAppend.length > 0) {
+              setRestaurantsCurrentPage(restaurantsCurrentPage + 1);
+              setRestaurantsRenderedData(prev => [...prev, ...contentToAppend]);
+            }
+            setIsLoadingRestaurants(false);
+          }}
         />
-      </View>
-
-      <FlatList
-        ListHeaderComponent={
-          <>
-            {/* Categories Section */}
-            <View style={styles.categoriesHeader}>
-              <Text style={styles.sectionTitle}>All Categories</Text>
-              <TouchableOpacity style={styles.seeAllContainer}>
-                <Text style={styles.seeAll}>See All</Text>
-                <MaterialIcons name="chevron-right" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={categoriesRenderedData}
-              renderItem={renderCategoryItem}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              onEndReachedThreshold={0.5}
-              onEndReached={() => {
-                if (isLoadingCategories) {
-                  return;
-                }
-                setIsLoadingCategories(true);
-                const contentToAppend = pagination(
-                  categories,
-                  categoriesCurrentPage + 1,
-                  pageSize,
-                );
-                if (contentToAppend.length > 0) {
-                  setCategoriesCurrentPage(categoriesCurrentPage + 1);
-                  setCategoriesRenderedData(prev => [...prev, ...contentToAppend]);
-                }
-                setIsLoadingCategories(false);
-              }}
-              style={styles.categoriesScroll}
-            />
-
-            {/* Restaurants Section */}
-            <View style={styles.categoriesHeader}>
-              <Text style={styles.sectionTitle}>Open Restaurants</Text>
-              <TouchableOpacity style={styles.seeAllContainer}>
-                <Text style={styles.seeAll}>See All</Text>
-                <MaterialIcons name="chevron-right" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-          </>
-        }
-        data={restaurantsRenderedData}
-        renderItem={renderRestaurantItem}
-        keyExtractor={(item) => item.id}
-        onEndReachedThreshold={0.5}
-        onEndReached={() => {
-          if (isLoadingRestaurants) {
-            return;
-          }
-          setIsLoadingRestaurants(true);
-          const contentToAppend = pagination(
-            restaurants,
-            restaurantsCurrentPage + 1,
-            pageSize,
-          );
-          if (contentToAppend.length > 0) {
-            setRestaurantsCurrentPage(restaurantsCurrentPage + 1);
-            setRestaurantsRenderedData(prev => [...prev, ...contentToAppend]);
-          }
-          setIsLoadingRestaurants(false);
-        }}
+      </SafeAreaView>
+      <SideMenu 
+        visible={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
       />
-    </SafeAreaView>
+    </>
   );
 }
 
@@ -340,7 +351,7 @@ const styles = StyleSheet.create({
         elevation: 3,
       },
       web: {
-boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
       },
     }),
   },
@@ -434,4 +445,3 @@ boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
     marginLeft: 4,
   },
 });
-
