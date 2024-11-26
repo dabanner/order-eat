@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SideMenu } from '../../components/SideMenu/side-menu';
@@ -48,183 +48,124 @@ const restaurants: Restaurant[] = [
 ];
 
 export default function HomeScreen() {
-  const pageSize = 4;
-  const [categoriesCurrentPage, setCategoriesCurrentPage] = useState(1);
-  const [categoriesRenderedData, setCategoriesRenderedData] = useState<Category[]>([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-
-  const [restaurantsCurrentPage, setRestaurantsCurrentPage] = useState(1);
-  const [restaurantsRenderedData, setRestaurantsRenderedData] = useState<Restaurant[]>([]);
-  const [isLoadingRestaurants, setIsLoadingRestaurants] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const pagination = <T extends Category | Restaurant>(database: T[], currentPage: number, pageSize: number): T[] => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    if (startIndex >= database.length) {
-      return [];
-    }
-    return database.slice(startIndex, endIndex);
-  };
+  const [categoriesRenderedData, setCategoriesRenderedData] = useState<Category[]>([]);
+  const [restaurantsRenderedData, setRestaurantsRenderedData] = useState<Restaurant[]>([]);
 
   useEffect(() => {
-    setIsLoadingCategories(true);
-    const getInitialCategoriesData = pagination(categories, 1, pageSize);
-    setCategoriesRenderedData(getInitialCategoriesData);
-    setIsLoadingCategories(false);
-
-    setIsLoadingRestaurants(true);
-    const getInitialRestaurantsData = pagination(restaurants, 1, pageSize);
-    setRestaurantsRenderedData(getInitialRestaurantsData);
-    setIsLoadingRestaurants(false);
+    setCategoriesRenderedData(categories);
+    setRestaurantsRenderedData(restaurants);
   }, []);
-
-  const renderCategoryItem = ({ item }: { item: Category }) => (
-    <View style={styles.categoryCard}>
-      <View style={styles.categoryImageContainer}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.categoryImage}
-        />
-      </View>
-      <Text style={styles.categoryName}>{item.name}</Text>
-      <Text style={styles.categoryPrice}>Starting <Text style={styles.price}>${item.price}</Text></Text>
-    </View>
-  );
-
-  const renderRestaurantItem = ({ item }: { item: Restaurant }) => (
-    <View style={styles.restaurantCard}>
-      <Image
-        source={{ uri: item.image }}
-        style={styles.restaurantImage}
-      />
-      <Text style={styles.restaurantName}>{item.name}</Text>
-      <Text style={styles.restaurantType}>{item.type}</Text>
-      <View style={styles.restaurantInfo}>
-        <View style={styles.ratingContainer}>
-          <FontAwesome name="star" size={16} color="#FF8C00" />
-          <Text style={styles.rating}>{item.rating}</Text>
-        </View>
-        <View style={styles.deliveryContainer}>
-          <MaterialCommunityIcons name="truck-delivery-outline" size={16} color="#FF8C00" />
-          <Text style={styles.deliveryText}>{item.delivery}</Text>
-        </View>
-        <View style={styles.timeContainer}>
-          <Ionicons name="time-outline" size={16} color="#FF8C00" />
-          <Text style={styles.timeText}>{item.time}</Text>
-        </View>
-      </View>
-    </View>
-  );
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.menuButton}
-            onPress={() => setIsMenuOpen(true)}
-          >
-            <MaterialIcons name="menu" size={24} color="#000" />
-          </TouchableOpacity>
-          <View style={styles.deliverTo}>
-            <Text style={styles.deliverToLabel}>DELIVER TO</Text>
-            <View style={styles.locationRow}>
-              <Text style={styles.location}>Halal Lab office</Text>
-              <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView 
+          style={styles.container}
+          showsVerticalScrollIndicator={Platform.OS === 'web'}
+        >
+          <View style={styles.content}>
+            {/* Header */}
+            <View style={styles.header}>
+              <TouchableOpacity 
+                style={styles.menuButton}
+                onPress={() => setIsMenuOpen(true)}
+              >
+                <MaterialIcons name="menu" size={24} color="#000" />
+              </TouchableOpacity>
+              <View style={styles.deliverTo}>
+                <Text style={styles.deliverToLabel}>DELIVER TO</Text>
+                <View style={styles.locationRow}>
+                  <Text style={styles.location}>Halal Lab office</Text>
+                  <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
+                </View>
+              </View>
+              <TouchableOpacity style={styles.cartButton}>
+                <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>2</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Greeting */}
+            <Text style={styles.greeting}>Hey Halal, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
+
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search dishes, restaurants"
+                placeholderTextColor="#666"
+              />
+            </View>
+
+            {/* Categories Section */}
+            <View style={styles.categoriesHeader}>
+              <Text style={styles.sectionTitle}>All Categories</Text>
+              <TouchableOpacity style={styles.seeAllContainer}>
+                <Text style={styles.seeAll}>See All</Text>
+                <MaterialIcons name="chevron-right" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={Platform.OS === 'web'}
+              style={styles.categoriesScroll}
+            >
+              {categoriesRenderedData.map((item) => (
+                <View key={item.id} style={styles.categoryCard}>
+                  <View style={styles.categoryImageContainer}>
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.categoryImage}
+                    />
+                  </View>
+                  <Text style={styles.categoryName}>{item.name}</Text>
+                  <Text style={styles.categoryPrice}>Starting <Text style={styles.price}>${item.price}</Text></Text>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* Restaurants Section */}
+            <View style={styles.categoriesHeader}>
+              <Text style={styles.sectionTitle}>Open Restaurants</Text>
+              <TouchableOpacity style={styles.seeAllContainer}>
+                <Text style={styles.seeAll}>See All</Text>
+                <MaterialIcons name="chevron-right" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.restaurantsGrid}>
+              {restaurantsRenderedData.map((item) => (
+                <View key={item.id} style={styles.restaurantCard}>
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.restaurantImage}
+                  />
+                  <Text style={styles.restaurantName}>{item.name}</Text>
+                  <Text style={styles.restaurantType}>{item.type}</Text>
+                  <View style={styles.restaurantInfo}>
+                    <View style={styles.ratingContainer}>
+                      <FontAwesome name="star" size={16} color="#FF8C00" />
+                      <Text style={styles.rating}>{item.rating}</Text>
+                    </View>
+                    <View style={styles.deliveryContainer}>
+                      <MaterialCommunityIcons name="truck-delivery-outline" size={16} color="#FF8C00" />
+                      <Text style={styles.deliveryText}>{item.delivery}</Text>
+                    </View>
+                    <View style={styles.timeContainer}>
+                      <Ionicons name="time-outline" size={16} color="#FF8C00" />
+                      <Text style={styles.timeText}>{item.time}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
             </View>
           </View>
-          <TouchableOpacity style={styles.cartButton}>
-            <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>2</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Greeting */}
-        <Text style={styles.greeting}>Hey Halal, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
-
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search dishes, restaurants"
-            placeholderTextColor="#666"
-          />
-        </View>
-
-        <FlatList
-          ListHeaderComponent={
-            <>
-              {/* Categories Section */}
-              <View style={styles.categoriesHeader}>
-                <Text style={styles.sectionTitle}>All Categories</Text>
-                <TouchableOpacity style={styles.seeAllContainer}>
-                  <Text style={styles.seeAll}>See All</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-
-              <FlatList
-                data={categoriesRenderedData}
-                renderItem={renderCategoryItem}
-                keyExtractor={(item) => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                onEndReachedThreshold={0.5}
-                onEndReached={() => {
-                  if (isLoadingCategories) {
-                    return;
-                  }
-                  setIsLoadingCategories(true);
-                  const contentToAppend = pagination(
-                    categories,
-                    categoriesCurrentPage + 1,
-                    pageSize,
-                  );
-                  if (contentToAppend.length > 0) {
-                    setCategoriesCurrentPage(categoriesCurrentPage + 1);
-                    setCategoriesRenderedData(prev => [...prev, ...contentToAppend]);
-                  }
-                  setIsLoadingCategories(false);
-                }}
-                style={styles.categoriesScroll}
-              />
-
-              {/* Restaurants Section */}
-              <View style={styles.categoriesHeader}>
-                <Text style={styles.sectionTitle}>Open Restaurants</Text>
-                <TouchableOpacity style={styles.seeAllContainer}>
-                  <Text style={styles.seeAll}>See All</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-            </>
-          }
-          data={restaurantsRenderedData}
-          renderItem={renderRestaurantItem}
-          keyExtractor={(item) => item.id}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {
-            if (isLoadingRestaurants) {
-              return;
-            }
-            setIsLoadingRestaurants(true);
-            const contentToAppend = pagination(
-              restaurants,
-              restaurantsCurrentPage + 1,
-              pageSize,
-            );
-            if (contentToAppend.length > 0) {
-              setRestaurantsCurrentPage(restaurantsCurrentPage + 1);
-              setRestaurantsRenderedData(prev => [...prev, ...contentToAppend]);
-            }
-            setIsLoadingRestaurants(false);
-          }}
-        />
+        </ScrollView>
       </SafeAreaView>
       <SideMenu 
         visible={isMenuOpen}
@@ -235,10 +176,23 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+  },
+  content: {
     padding: 16,
+    ...Platform.select({
+      web: {
+        
+maxWidth: '100%',
+        width: '100%',
+        marginHorizontal: 'auto',
+      },
+    }),
   },
   header: {
     flexDirection: 'row',
@@ -333,31 +287,48 @@ const styles = StyleSheet.create({
   },
   categoriesScroll: {
     marginBottom: 24,
+    ...Platform.select({
+      web: {
+        WebkitOverflowScrolling: 'touch',
+      },
+    }),
   },
   categoryCard: {
     marginRight: 16,
-    width: 120,
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 12,
     ...Platform.select({
       ios: {
+        width: 120,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
       },
       android: {
+        width: 120,
         elevation: 3,
       },
       web: {
+        width: 180,
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
       },
     }),
   },
   categoryImageContainer: {
     width: '100%',
-    height: 100,
+    ...Platform.select({
+      ios: {
+        height: 100,
+      },
+      android: {
+        height: 100,
+      },
+      web: {
+        height: 150,
+      },
+    }),
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
     marginBottom: 8,
@@ -380,6 +351,13 @@ const styles = StyleSheet.create({
     color: '#FF8C00',
     fontWeight: '600',
   },
+  restaurantsGrid: {
+    ...Platform.select({
+      web: {
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+      },
+    }),
+  },
   restaurantCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -397,6 +375,7 @@ const styles = StyleSheet.create({
       },
       web: {
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        marginBottom: 0,
       },
     }),
   },
@@ -419,11 +398,11 @@ const styles = StyleSheet.create({
   restaurantInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
   },
   rating: {
     marginLeft: 4,
@@ -432,7 +411,6 @@ const styles = StyleSheet.create({
   deliveryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
   },
   deliveryText: {
     marginLeft: 4,
@@ -445,3 +423,4 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
 });
+
