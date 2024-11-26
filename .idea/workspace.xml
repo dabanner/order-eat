@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9ca4720b-f580-4adf-a827-3f6768948f19" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/validate-commit-message.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/validate-commit-message.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +71,7 @@
       <updated>1732538577327</updated>
       <workItem from="1732538578657" duration="10029000" />
       <workItem from="1732606702985" duration="3204000" />
-      <workItem from="1732609913358" duration="463000" />
+      <workItem from="1732609913358" duration="1100000" />
     </task>
     <servers />
   </component>
