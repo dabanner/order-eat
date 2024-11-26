@@ -1,13 +1,38 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import {Checkbox} from "@/components/ui/Checkbox";
+import { CheckboxWithLabel } from "@/components/CheckboxWithLabel";
+import { SocialButton } from "@/components/SocialButton";
+import { InputField } from "@/components/InputField";
+import { Divider } from "@/components/Divider";
 
 export default function LoginScreen() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+
+    const handleLogin = () => {
+        // Implement login logic here
+        console.log('Login pressed with:', { email, password, rememberMe });
+    };
+
+    const handleForgotPassword = () => {
+        // Implement forgot password logic here
+        console.log('Forgot password pressed');
+    };
+
+    const handleSignUp = () => {
+        // Implement sign up navigation here
+        console.log('Sign up pressed');
+    };
+
+    const handleSocialLogin = (provider: 'google' | 'apple') => {
+        // Implement social login logic here
+        console.log(`${provider} login pressed`);
+    };
 
     return (
         <ParallaxScrollView
@@ -32,77 +57,65 @@ export default function LoginScreen() {
             }
         >
             <ThemedView style={styles.formContainer}>
-                <View style={styles.inputGroup}>
-                    <ThemedText style={styles.label}>EMAIL</ThemedText>
-                    <TextInput
-                        style={styles.input}
+                <View>
+                    <InputField
+                        label="EMAIL"
                         placeholder="Enter your email"
                         keyboardType="email-address"
-                        textContentType="emailAddress"
                         autoCapitalize="none"
-                        autoCorrect={false}
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+
+                    <InputField
+                        label="PASSWORD"
+                        placeholder="Enter your password"
+                        secureTextEntry={!showPassword}
+                        value={password}
+                        onChangeText={setPassword}
+                        rightIcon={
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                <ThemedText>{showPassword ? 'Hide' : 'Show'}</ThemedText>
+                            </TouchableOpacity>
+                        }
                     />
                 </View>
 
-                <View style={styles.inputGroup}>
-                    <ThemedText style={styles.label}>PASSWORD</ThemedText>
-                    <View style={styles.passwordContainer}>
-                        <TextInput
-                            style={[styles.input, styles.passwordInput]}
-                            placeholder="Enter your password"
-                            secureTextEntry={!showPassword}
-                            textContentType="password"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                        />
-                    </View>
-                </View>
-
-                <View style={styles.rememberContainer}>
-                    <View style={styles.checkboxContainer}>
-                        <Checkbox
-                            checked={rememberMe}
-                            onValueChange={setRememberMe}
-                        />
-                        <ThemedText style={styles.rememberText}>Remember me</ThemedText>
-                    </View>
-                    <TouchableOpacity>
-                        <ThemedText style={styles.forgotPassword}>Forgot Password</ThemedText>
+                <View style={styles.rememberForgotContainer}>
+                    <CheckboxWithLabel
+                        label="Remember me"
+                        checked={rememberMe}
+                        onValueChange={setRememberMe}
+                    />
+                    <TouchableOpacity onPress={handleForgotPassword}>
+                        <ThemedText style={styles.forgotPassword}>Forgot Password?</ThemedText>
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.loginButton}>
+                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     <ThemedText style={styles.loginButtonText}>LOG IN</ThemedText>
                 </TouchableOpacity>
 
                 <View style={styles.signupContainer}>
                     <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={handleSignUp}>
                         <ThemedText style={styles.signupLink}>SIGN UP</ThemedText>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.dividerContainer}>
-                    <View style={styles.divider} />
-                    <ThemedText style={styles.dividerText}>Or</ThemedText>
-                    <View style={styles.divider} />
-                </View>
+                <Divider text="Or" />
 
                 <View style={styles.socialContainer}>
-                    <TouchableOpacity style={[styles.socialButton, styles.gmail]}>
-                        <Image
-                            source={require('@/assets/images/gmail.png')}
-                            style={[styles.socialIcon, { width: 54, height: 54 }]}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.socialButton, styles.apple]}>
-                        <Image
-                            source={require('@/assets/images/apple.png')}
-                            style={[styles.socialIcon, { tintColor: '#F5F5F5', width: 43, height: 44 }]}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
+                    <SocialButton
+                        source={require('@/assets/images/gmail.png')}
+                        style={styles.gmail}
+                        onPress={() => handleSocialLogin('google')}
+                    />
+                    <SocialButton
+                        source={require('@/assets/images/apple.png')}
+                        style={[styles.apple]}
+                        onPress={() => handleSocialLogin('apple')}
+                    />
                 </View>
             </ThemedView>
         </ParallaxScrollView>
@@ -150,46 +163,11 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
     },
-    inputGroup: {
-        marginBottom: 24,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: '600',
-        marginBottom: 8,
-        color: '#333',
-    },
-    input: {
-        height: 48,
-        backgroundColor: '#F5F6FA',
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        fontSize: 16,
-    },
-    passwordContainer: {
-        position: 'relative',
-    },
-    passwordInput: {
-        paddingRight: 48,
-    },
-    eyeIcon: {
-        position: 'absolute',
-        right: 16,
-        top: 14,
-    },
-    rememberContainer: {
+    rememberForgotContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 24,
-    },
-    checkboxContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    rememberText: {
-        marginLeft: 8,
-        color: '#666',
     },
     forgotPassword: {
         color: '#F4804F',
@@ -220,42 +198,16 @@ const styles = StyleSheet.create({
         color: '#F4804F',
         fontWeight: '600',
     },
-    dividerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    divider: {
-        flex: 1,
-        height: 1,
-        backgroundColor: '#E5E5E5',
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: '#666',
-    },
     socialContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 16,
     },
-    socialButton: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     gmail: {
         backgroundColor: '#dcdcdc',
     },
     apple: {
-        backgroundColor: '#000000',
-    },
-    socialIcon: {
-        justifyContent: 'center',
-        alignItems: 'center',
-
+        backgroundColor: '#dcdcdc',
     },
 });
 

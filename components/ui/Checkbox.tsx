@@ -8,6 +8,7 @@ interface CheckboxProps {
 }
 
 export function Checkbox({ checked, onValueChange }: CheckboxProps) {
+    console.log("onValueChange:", onValueChange); // Debugging log
     return (
         <TouchableOpacity onPress={() => onValueChange(!checked)}>
             <View style={[styles.checkbox, checked && styles.checked]}>
@@ -16,6 +17,7 @@ export function Checkbox({ checked, onValueChange }: CheckboxProps) {
         </TouchableOpacity>
     );
 }
+
 
 const styles = StyleSheet.create({
     checkbox: {
