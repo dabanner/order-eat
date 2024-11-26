@@ -4,21 +4,21 @@ on:
   push:
     branches:
       - main
-      - '**'
+      - '**' # Trigger on all branches
 
 jobs:
   validate-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Validate commit messages
         run: |
-          for commit in $(git log --oneline --pretty=format:"%h"); do
+          for commit in $(git log --oneline --pretty=format:"%h" $GITHUB_SHA); do
             message=$(git log -1 --pretty=format:"%s" $commit)
-            if [[ ! "$message" =~ ^[0-9]+-.* ]]; then
-              echo "Commit $commit does not follow the format '(IssueNumber)-(message)': $message"
+            if [[ ! "$message" =~ ^#\([0-9]+\)\ .+ ]]; then
+              echo "Commit $commit does not follow the required format: #(<int>) <message>"
+              echo "Invalid message: $message"
               exit 1
-            fi
-          done
+           
