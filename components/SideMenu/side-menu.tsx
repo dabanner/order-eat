@@ -77,7 +77,6 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
 
   return (
     <View style={styles.overlay}>
-      <TouchableOpacity style={styles.dismissArea} onPress={onClose} />
       <View style={styles.menuContainer}>
         <SafeAreaView style={styles.content}>
           <ScrollView>
@@ -121,6 +120,7 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
           </ScrollView>
         </SafeAreaView>
       </View>
+      <TouchableOpacity style={styles.dismissArea} onPress={onClose} />
     </View>
   );
 }
