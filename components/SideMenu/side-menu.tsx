@@ -14,8 +14,33 @@ interface SideMenuProps {
   onClose: () => void;
 }
 
+type IconName = 
+  | React.ComponentProps<typeof Ionicons>['name']
+  | React.ComponentProps<typeof MaterialIcons>['name']
+  | React.ComponentProps<typeof FontAwesome>['name']
+  | React.ComponentProps<typeof MaterialCommunityIcons>['name']
+  | React.ComponentProps<typeof Feather>['name'];
+
+interface MenuItem {
+  id: string;
+  icon: IconName;
+  iconSet: typeof Ionicons | typeof MaterialIcons | typeof FontAwesome | typeof MaterialCommunityIcons | typeof Feather;
+  label: string;
+  color: string;
+}
+
+interface MenuSection {
+  section: number;
+  items: MenuItem[];
+}
+
+const IconComponent: React.FC<{ item: MenuItem }> = ({ item }) => {
+  const IconSet = item.iconSet;
+  return <IconSet name={item.icon as any} size={24} color={item.color} />;
+};
+
 export function SideMenu({ visible, onClose }: SideMenuProps) {
-  const menuItems = [
+  const menuItems: MenuSection[] = [
     {
       section: 1,
       items: [
@@ -27,7 +52,7 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
       section: 2,
       items: [
         { id: 'cart', icon: 'cart-outline', iconSet: Ionicons, label: 'Cart', color: '#4B7BE5' },
-        { id: 'favourite', icon: 'heart-outline', iconSet: Ionicons, label: 'Favourite', color: '#E5344B' },
+        { id: 'heart-outline', icon: 'heart-outline', iconSet: Ionicons, label: 'Favourite', color: '#E5344B' },
         { id: 'notifications', icon: 'notifications-outline', iconSet: Ionicons, label: 'Notifications', color: '#FFB443' },
         { id: 'payment', icon: 'card-outline', iconSet: Ionicons, label: 'Payment Method', color: '#4B7BE5' },
       ]
@@ -52,9 +77,11 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
 
   return (
     <View style={styles.overlay}>
+      <TouchableOpacity style={styles.dismissArea} onPress={onClose} />
       <View style={styles.menuContainer}>
         <SafeAreaView style={styles.content}>
           <ScrollView>
+            {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity onPress={onClose}>
                 <Ionicons name="chevron-back" size={24} color="#000" />
@@ -65,6 +92,7 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
               </TouchableOpacity>
             </View>
 
+            {/* Profile Section */}
             <View style={styles.profile}>
               <View style={styles.avatar}>
                 <Image
@@ -76,12 +104,13 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
               <Text style={styles.bio}>I love fast food</Text>
             </View>
 
-            {menuItems.map((section, index) => (
-              <View key={section.section} style={[styles.section, index > 0 && styles.sectionMargin]}>
+            {/* Menu Items */}
+            {menuItems.map((section) => (
+              <View key={section.section} style={[styles.section, section.section > 1 && styles.sectionMargin]}>
                 {section.items.map((item) => (
                   <TouchableOpacity key={item.id} style={styles.menuItem}>
                     <View style={styles.menuItemContent}>
-                      <item.iconSet name={item.icon} size={24} color={item.color} />
+                      <IconComponent item={item} />
                       <Text style={styles.menuItemLabel}>{item.label}</Text>
                     </View>
                     <MaterialIcons name="chevron-right" size={24} color="#666" />
@@ -92,7 +121,6 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
           </ScrollView>
         </SafeAreaView>
       </View>
-      <TouchableOpacity style={styles.dismissArea} onPress={onClose} />
     </View>
   );
 }
