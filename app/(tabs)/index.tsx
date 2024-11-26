@@ -287,11 +287,12 @@ maxWidth: '100%',
   },
   categoriesScroll: {
     marginBottom: 24,
-    ...Platform.select({
+    ...(Platform.select({
       web: {
+        overflow: 'auto' as any,
         WebkitOverflowScrolling: 'touch',
       },
-    }),
+    }) as any),
   },
   categoryCard: {
     marginRight: 16,
@@ -354,7 +355,9 @@ maxWidth: '100%',
   restaurantsGrid: {
     ...Platform.select({
       web: {
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        display: 'grid' as 'flex',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+        gap: 16,
       },
     }),
   },
@@ -399,6 +402,7 @@ maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
+    gap: 16,
   },
   ratingContainer: {
     flexDirection: 'row',
