@@ -1,37 +1,27 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
+import {ThemedView} from "@/components/ThemedView";
+import {ThemedText} from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { CheckboxWithLabel } from "@/components/CheckboxWithLabel";
-import { SocialButton } from "@/components/SocialButton";
-import { InputField } from "@/components/InputField";
-import { Divider } from "@/components/Divider";
+import {InputField} from "@/components/InputField";
 
-export default function LoginScreen() {
+
+export default function SignUpScreen() {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
+    const [repeatPassword, setRepeatPassword] = useState('');
+    const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+
+    const handleSignup = () => {
+        // TODO
+        console.log('SignUp pressed with:', {name, email, password, repeatPassword });
+    };
 
     const handleLogin = () => {
         // TODO
-        console.log('Login pressed with:', { email, password, rememberMe });
-    };
-
-    const handleForgotPassword = () => {
-        // TODO
-        console.log('Forgot password pressed');
-    };
-
-    const handleSignUp = () => {
-        // TODO
-        console.log('Sign up pressed');
-    };
-
-    const handleSocialLogin = (provider: 'google' | 'apple') => {
-        // TODO
-        console.log(`${provider} login pressed`);
+        console.log('Login pressed');
     };
 
     return (
@@ -44,9 +34,9 @@ export default function LoginScreen() {
                         style={styles.motif1}
                     />
                     <View style={styles.headerContent}>
-                        <ThemedText style={styles.headerTitle}>Log In</ThemedText>
+                        <ThemedText style={styles.headerTitle}>Sign Up</ThemedText>
                         <ThemedText style={styles.headerSubtitle}>
-                            Please sign in to your existing account
+                            Please sign up to get started
                         </ThemedText>
                     </View>
                     <Image
@@ -58,6 +48,13 @@ export default function LoginScreen() {
         >
             <ThemedView style={styles.formContainer}>
                 <View>
+                    <InputField
+                        label="FULL NAME"
+                        placeholder="Enter your full name"
+                        value={name}
+                        onChangeText={setName}
+
+                    />
                     <InputField
                         label="EMAIL"
                         placeholder="Enter your email"
@@ -79,48 +76,37 @@ export default function LoginScreen() {
                             </TouchableOpacity>
                         }
                     />
-                </View>
 
-                <View style={styles.rememberForgotContainer}>
-                    <CheckboxWithLabel
-                        label="Remember me"
-                        checked={rememberMe}
-                        onValueChange={setRememberMe}
+                    <InputField
+                        label="REPEAT PASSWORD"
+                        placeholder="Repeat your password"
+                        secureTextEntry={!showRepeatPassword}
+                        value={repeatPassword}
+                        onChangeText={setRepeatPassword}
+                        rightIcon={
+                            <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)}>
+                                <ThemedText style={{ color: '#707070'}} >{showRepeatPassword ? 'Hide' : 'Show'}</ThemedText>
+                            </TouchableOpacity>
+                        }
                     />
-                    <TouchableOpacity onPress={handleForgotPassword}>
-                        <ThemedText style={styles.forgotPassword}>Forgot Password?</ThemedText>
-                    </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                    <ThemedText style={styles.loginButtonText}>LOG IN</ThemedText>
+                <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+                    <ThemedText style={styles.signupButtonText}>Sign Up</ThemedText>
                 </TouchableOpacity>
 
-                <View style={styles.signupContainer}>
-                    <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
-                    <TouchableOpacity onPress={handleSignUp}>
-                        <ThemedText style={styles.signupLink}>SIGN UP</ThemedText>
+                <View style={styles.loginContainer}>
+                    <ThemedText style={styles.loginText}>Do you have an account ? </ThemedText>
+                    <TouchableOpacity onPress={handleLogin}>
+                        <ThemedText style={styles.loginLink}>LOG IN</ThemedText>
                     </TouchableOpacity>
-                </View>
-
-                <Divider text="Or" />
-
-                <View style={styles.socialContainer}>
-                    <SocialButton
-                        source={require('@/assets/images/gmail.png')}
-                        style={styles.gmail}
-                        onPress={() => handleSocialLogin('google')}
-                    />
-                    <SocialButton
-                        source={require('@/assets/images/apple.png')}
-                        style={[styles.apple]}
-                        onPress={() => handleSocialLogin('apple')}
-                    />
                 </View>
             </ThemedView>
         </ParallaxScrollView>
-    );
+    )
 }
+
+
 
 const styles = StyleSheet.create({
     headerContainer: {
@@ -163,16 +149,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
     },
-    rememberForgotContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    forgotPassword: {
-        color: '#F4804F',
-    },
-    loginButton: {
+    signupButton: {
         backgroundColor: '#F4804F',
         height: 48,
         borderRadius: 8,
@@ -180,34 +157,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
     },
-    loginButtonText: {
+    signupButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
-    signupContainer: {
+    loginContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 24,
     },
-    signupText: {
+    loginText: {
         color: '#666',
     },
-    signupLink: {
+    loginLink: {
         color: '#F4804F',
         fontWeight: '600',
     },
-    socialContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 16,
-    },
-    gmail: {
-        backgroundColor: '#dcdcdc',
-    },
-    apple: {
-        backgroundColor: '#dcdcdc',
-    },
 });
-
