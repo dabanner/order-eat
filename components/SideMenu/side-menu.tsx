@@ -8,6 +8,7 @@ import {
   MaterialCommunityIcons,
   Feather
 } from '@expo/vector-icons';
+import { useUserStore } from '../../store/userStore';
 
 interface SideMenuProps {
   visible: boolean;
@@ -40,6 +41,8 @@ const IconComponent: React.FC<{ item: MenuItem }> = ({ item }) => {
 };
 
 export function SideMenu({ visible, onClose }: SideMenuProps) {
+  const user = useUserStore((state) => state.user);
+
   const menuItems: MenuSection[] = [
     {
       section: 1,
@@ -95,11 +98,11 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
             <View style={styles.profile}>
               <View style={styles.avatar}>
                 <Image
-                  source={{ uri: '/placeholder.svg?height=120&width=120' }}
+                  source={{ uri: user?.profileImage || '/placeholder.svg?height=120&width=120' }}
                   style={styles.avatarImage}
                 />
               </View>
-              <Text style={styles.name}>Halal Lab</Text>
+              <Text style={styles.name}>{user?.name || 'Guest'}</Text>
               <Text style={styles.bio}>I love fast food</Text>
             </View>
 
@@ -155,6 +158,10 @@ const styles = StyleSheet.create({
       },
       web: {
         boxShadow: '-2px 0px 8px rgba(0, 0, 0, 0.1)',
+        '@media (min-width: 768px)': {
+          width: '30%',
+          maxWidth: 400,
+        },
       },
     }),
   },
