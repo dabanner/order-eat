@@ -1,139 +1,141 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { SideMenu } from '../../components/SideMenu/side-menu';
-import { useCategoryStore, Category } from '../../store/categoryStore';
-import { useRestaurantStore, Restaurant } from '../../store/restaurantStore';
-import { useUserStore } from '../../store/userStore';
+import { Link, useRouter } from 'expo-router';
+import { useCategoryStore } from '../store/categoryStore';
+import { useRestaurantStore } from '../store/restaurantStore';
+import { useUserStore } from '../store/userStore';
+import { SideMenu } from '../components/SideMenu/side-menu';
 
 export default function HomeScreen() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const categories = useCategoryStore((state) => state.categories);
   const restaurants = useRestaurantStore((state) => state.restaurants);
-  const {user, setUser} = useUserStore(); //TODO: Put this in login screen
+  const { user, setUser } = useUserStore();
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setUser();
     }
-  }, [user,setUser]);
+  }, [user, setUser]);
+
+  const openSideMenu = () => {
+    setIsSideMenuOpen(true);
+  };
 
   return (
-    <>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView 
-          style={styles.container}
-          showsVerticalScrollIndicator={Platform.OS === 'web'}
-        >
-          <View style={styles.content}>
-            {/* Header */}
-            <View style={styles.header}>
-              <TouchableOpacity 
-                style={styles.menuButton}
-                onPress={() => setIsMenuOpen(true)}
-              >
-                <MaterialIcons name="menu" size={24} color="#000" />
-              </TouchableOpacity>
-              <View style={styles.deliverTo}>
-                <Text style={styles.deliverToLabel}>DELIVER TO</Text>
-                <View style={styles.locationRow}>
-                  <Text style={styles.location}>Halal Lab office</Text>
-                  <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
-                </View>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={Platform.OS === 'web'}
+      >
+        <View style={styles.content}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={openSideMenu} style={styles.menuButton}>
+              <MaterialIcons name="menu" size={24} color="#000" />
+            </TouchableOpacity>
+            <View style={styles.deliverTo}>
+              <Text style={styles.deliverToLabel}>DELIVER TO</Text>
+              <View style={styles.locationRow}>
+                <Text style={styles.location}>Halal Lab office</Text>
+                <MaterialIcons name="keyboard-arrow-down" size={24} color="#000" />
               </View>
-              <TouchableOpacity style={styles.cartButton}>
-                <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
-                <View style={styles.cartBadge}>
-                  <Text style={styles.cartBadgeText}>2</Text>
-                </View>
-              </TouchableOpacity>
             </View>
+            <TouchableOpacity style={styles.cartButton}>
+              <MaterialCommunityIcons name="shopping-outline" size={24} color="#000" />
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>2</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
-            {/* Greeting */}
-            <Text style={styles.greeting}>Hey {user?.name}, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
+          {/* Greeting */}
+          <Text style={styles.greeting}>Hey {user?.name}, <Text style={styles.greetingTime}>Good Afternoon!</Text></Text>
 
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search dishes, restaurants"
-                placeholderTextColor="#666"
-              />
-            </View>
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search dishes, restaurants"
+              placeholderTextColor="#666"
+            />
+          </View>
 
-            {/* Categories Section */}
-            <View style={styles.categoriesHeader}>
-              <Text style={styles.sectionTitle}>All Categories</Text>
-              <TouchableOpacity style={styles.seeAllContainer}>
-                <Text style={styles.seeAll}>See All</Text>
-                <MaterialIcons name="chevron-right" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
+          {/* Categories Section */}
+          <View style={styles.categoriesHeader}>
+            <Text style={styles.sectionTitle}>All Categories</Text>
+            <TouchableOpacity style={styles.seeAllContainer}>
+              <Text style={styles.seeAll}>See All</Text>
+              <MaterialIcons name="chevron-right" size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
 
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={Platform.OS === 'web'}
-              style={styles.categoriesScroll}
-            >
-              {categories.map((item) => (
-                <View key={item.id} style={styles.categoryCard}>
-                  <View style={styles.categoryImageContainer}>
-                    <Image
-                      source={{ uri: item.image }}
-                      style={styles.categoryImage}
-                    />
-                  </View>
-                  <Text style={styles.categoryName}>{item.name}</Text>
-                  <Text style={styles.categoryPrice}>Starting <Text style={styles.price}>${item.price}</Text></Text>
-                </View>
-              ))}
-            </ScrollView>
-
-            {/* Restaurants Section */}
-            <View style={styles.categoriesHeader}>
-              <Text style={styles.sectionTitle}>Open Restaurants</Text>
-              <TouchableOpacity style={styles.seeAllContainer}>
-                <Text style={styles.seeAll}>See All</Text>
-                <MaterialIcons name="chevron-right" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.restaurantsGrid}>
-              {restaurants.map((item) => (
-                <View key={item.id} style={styles.restaurantCard}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={Platform.OS === 'web'}
+            style={styles.categoriesScroll}
+          >
+            {categories.map((item) => (
+              <View key={item.id} style={styles.categoryCard}>
+                <View style={styles.categoryImageContainer}>
                   <Image
                     source={{ uri: item.image }}
-                    style={styles.restaurantImage}
+                    style={styles.categoryImage}
                   />
-                  <Text style={styles.restaurantName}>{item.name}</Text>
-                  <Text style={styles.restaurantType}>{item.type}</Text>
-                  <View style={styles.restaurantInfo}>
-                    <View style={styles.ratingContainer}>
-                      <FontAwesome name="star" size={16} color="#FF8C00" />
-                      <Text style={styles.rating}>{item.rating}</Text>
-                    </View>
-                    <View style={styles.deliveryContainer}>
-                      <MaterialCommunityIcons name="truck-delivery-outline" size={16} color="#FF8C00" />
-                      <Text style={styles.deliveryText}>{item.delivery}</Text>
-                    </View>
-                    <View style={styles.timeContainer}>
-                      <Ionicons name="time-outline" size={16} color="#FF8C00" />
-                      <Text style={styles.timeText}>{item.time}</Text>
-                    </View>
+                </View>
+                <Text style={styles.categoryName}>{item.name}</Text>
+                <Text style={styles.categoryPrice}>Starting <Text style={styles.price}>${item.price}</Text></Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Restaurants Section */}
+          <View style={styles.categoriesHeader}>
+            <Text style={styles.sectionTitle}>Open Restaurants</Text>
+            <TouchableOpacity style={styles.seeAllContainer}>
+              <Text style={styles.seeAll}>See All</Text>
+              <MaterialIcons name="chevron-right" size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.restaurantsGrid}>
+            {restaurants.map((item) => (
+              <View key={item.id} style={styles.restaurantCard}>
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.restaurantImage}
+                />
+                <Text style={styles.restaurantName}>{item.name}</Text>
+                <Text style={styles.restaurantType}>{item.type}</Text>
+                <View style={styles.restaurantInfo}>
+                  <View style={styles.ratingContainer}>
+                    <FontAwesome name="star" size={16} color="#FF8C00" />
+                    <Text style={styles.rating}>{item.rating}</Text>
+                  </View>
+                  <View style={styles.deliveryContainer}>
+                    <MaterialCommunityIcons name="truck-delivery-outline" size={16} color="#FF8C00" />
+                    <Text style={styles.deliveryText}>{item.delivery}</Text>
+                  </View>
+                  <View style={styles.timeContainer}>
+                    <Ionicons name="time-outline" size={16} color="#FF8C00" />
+                    <Text style={styles.timeText}>{item.time}</Text>
                   </View>
                 </View>
-              ))}
-            </View>
+              </View>
+            ))}
           </View>
-        </ScrollView>
-      </SafeAreaView>
-      <SideMenu 
-        visible={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-      />
-    </>
+        </View>
+      </ScrollView>
+      {isSideMenuOpen && (
+        <SideMenu
+          visible={isSideMenuOpen}
+          onClose={() => setIsSideMenuOpen(false)}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
@@ -389,4 +391,3 @@ maxWidth: '100%',
     marginLeft: 4,
   },
 });
-

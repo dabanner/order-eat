@@ -9,6 +9,7 @@ import {
   Feather
 } from '@expo/vector-icons';
 import { useUserStore } from '../../store/userStore';
+import { useRouter } from 'expo-router';
 
 interface SideMenuProps {
   visible: boolean;
@@ -41,7 +42,14 @@ const IconComponent: React.FC<{ item: MenuItem }> = ({ item }) => {
 };
 
 export function SideMenu({ visible, onClose }: SideMenuProps) {
-  const user = useUserStore((state) => state.user);
+  const { user, logout } = useUserStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.replace('/login');
+    onClose();
+  };
 
   const menuItems: MenuSection[] = [
     {
@@ -110,7 +118,11 @@ export function SideMenu({ visible, onClose }: SideMenuProps) {
             {menuItems.map((section) => (
               <View key={section.section} style={[styles.section, section.section > 1 && styles.sectionMargin]}>
                 {section.items.map((item) => (
-                  <TouchableOpacity key={item.id} style={styles.menuItem}>
+                  <TouchableOpacity 
+                    key={item.id} 
+                    style={styles.menuItem}
+                    onPress={item.id === 'logout' ? handleLogout : onClose}
+                  >
                     <View style={styles.menuItemContent}>
                       <IconComponent item={item} />
                       <Text style={styles.menuItemLabel}>{item.label}</Text>
