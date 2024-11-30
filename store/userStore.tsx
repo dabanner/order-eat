@@ -9,6 +9,8 @@ interface User {
 interface UserStore {
     user: User | null;
     setUser: () => void;
+    setUserWithParams: (user: User) => void;
+    logout: () => void;
 }
 
 const initialUser: User = {
@@ -19,5 +21,8 @@ const initialUser: User = {
 
 export const useUserStore = create<UserStore>((set) => ({
     user: null,
-    setUser: () => set({ user:initialUser }),
+    setUser: () => set({ user: initialUser }),
+    setUserWithParams: (user: User) => set({ user }),
+    logout: () => set({ user: null }),
 }));
+
